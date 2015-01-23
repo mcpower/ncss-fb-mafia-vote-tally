@@ -55,3 +55,4 @@ target/
 
 # secret config files
 config.txt
+output/

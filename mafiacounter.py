@@ -2,7 +2,7 @@ from __future__ import print_function
 import requests
 import re
 import json
-import jinja2
+from jinja2 import Environment, FileSystemLoader
 
 
 access_token, post_id, group_id, cutoff = [line.strip() for line in open("config.txt").readlines()]
@@ -12,7 +12,7 @@ MEMBERS_TEMPLATE = "https://graph.facebook.com/v2.2/{group_id}/members?fields=id
 comments_url = COMMENTS_TEMPLATE.format(post_id=post_id, access_token=access_token)
 members_url = MEMBERS_TEMPLATE.format(group_id=group_id, access_token=access_token)
 
-vote_re = re.compile(r"\b(?P<is_unvote>UN)?VOTE: ")
+vote_re = re.compile(r"\b(?P<is_unvote>UN)?VOTE( |[^ \n] )", re.I)
 users = {}
 
 class User:
@@ -100,7 +100,7 @@ for i, json_comment in enumerate(json_comments):
 		if end in tags:
 			voted = tags[end]
 		else:
-			possible_voted = [user for user in users_values if comment.message.startswith(user.name, end)]
+			possible_voted = [user for user in users_values if comment.message.lower().startswith(user.name.lower(), end)]
 			if len(possible_voted) == 0:
 				# print("Didn't find any users.")
 				continue
@@ -121,3 +121,13 @@ for i, json_comment in enumerate(json_comments):
 			comment.vote_details.append((voted, False))
 			# print(comment.user, "voted for", voted)
 	# print()
+
+env = Environment(loader=FileSystemLoader("templates"), trim_blocks=True, lstrip_blocks=True)
+filtered_users = [user for user in users_values if user.voted_user]
+tally = {} # User: [User]
+for user in filtered_users:
+	if user.voted_user not in tally:
+		tally[user.voted_user] = []
+	tally[user.voted_user].append(user)
+sorted_tally = sorted(tally.items(), key=lambda x: len(x[1]), reverse=True)
+open("output/index.html", "w").write(env.get_template("index.html").render(comments=comments, users=list(users_values), tally=sorted_tally).encode("utf-8"))

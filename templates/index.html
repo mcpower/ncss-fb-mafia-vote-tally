@@ -1,0 +1,13 @@
+{% macro profile_picture(user) -%}
+    <img src="{{user.picture}}" alt="{{user.name}}" title="{{user.name}}">
+{%- endmacro %}
+<!DOCTYPE html>
+<html>
+	<body>
+		{% for victim, against in tally %}
+		<p>
+			{{ profile_picture(victim) }} was voted against by {% for lyncher in against %}{{ profile_picture(lyncher) }}{% endfor %}
+		</p>
+		{% endfor %}
+	</body>
+</html>
