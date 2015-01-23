@@ -3,6 +3,14 @@ Tallies the NCSS Mafia Facebook page votes.
 
 Warning: extremely hacky and bad code.
 
+# Prerequisites
+You need a few things:
+* Python 2
+* Requests
+* Jinja2
+
+`pip` is your friend when installing the latter two.
+
 Put this in config.txt:
 
 ```
