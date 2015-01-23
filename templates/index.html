@@ -11,7 +11,7 @@
 		<div style="white-space:nowrap;">
 			{% for victim, against in tally %}
 			<p>
-				{{ profile_picture(victim) }} was voted against by {% for lyncher in against %}{{ profile_picture(lyncher) }}{% endfor %} ({{ against|count }})
+				{{ profile_picture(victim) }} was voted by {% for lyncher in against %}{{ profile_picture(lyncher) }}{% endfor %} ({{ against|count }})
 			</p>
 			{% endfor %}
 		</div>
@@ -32,7 +32,7 @@
 					{% if comment.index - last_index > 1 %}
 					<tr>
 						<td></td>
-						<td><i>({{ comment.index - last_index - 1 }} comment{% if comment.index - last_index != 2 %}s{% endif %} in-between)</i></td>
+						<td><i>({{ comment.index - last_index - 1 }} comment{% if comment.index - last_index != 2 %}s{% endif %} hidden)</i></td>
 						<td></td>
 						<td></td>
 					</tr>
