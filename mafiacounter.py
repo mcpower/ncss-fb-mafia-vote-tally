@@ -86,12 +86,15 @@ class Comment:
 			index
 		)
 
+overtime = False
 for i, json_comment in enumerate(json_comments):
 	vote_finds = list(vote_re.finditer(json_comment["message"]))
 	if not vote_finds or json_comment["from"]["name"] in ignore:
 		continue
 	comment = Comment.from_json(json_comment, i)
-	
+	if comment.time >= cutoff:
+		overtime = True
+		break
 
 	tags = {tag["offset"]: get_user(tag["id"], tag["name"]) for tag in comment.message_tags}
 
@@ -143,4 +146,4 @@ for user in filtered_users:
 		tally[user.voted_user] = []
 	tally[user.voted_user].append(user)
 sorted_tally = sorted(tally.items(), key=lambda x: len(x[1]), reverse=True)
-open("output/index.html", "w").write(env.get_template("index.html").render(comments=comments, users=list(users_values), tally=sorted_tally).encode("utf-8"))
+open("output/index.html", "w").write(env.get_template("index.html").render(comments=comments, users=list(users_values), tally=sorted_tally, overtime=overtime).encode("utf-8"))
