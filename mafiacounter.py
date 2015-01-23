@@ -13,7 +13,7 @@ MEMBERS_TEMPLATE = "https://graph.facebook.com/v2.2/{group_id}/members?fields=id
 comments_url = COMMENTS_TEMPLATE.format(post_id=post_id, access_token=access_token)
 members_url = MEMBERS_TEMPLATE.format(group_id=group_id, access_token=access_token)
 
-vote_re = re.compile(r"\b(?P<is_unvote>UN)?VOTE( |[^ \n] )", re.I)
+vote_re = re.compile(r"\b(?P<is_unvote>UN)?VOTE( |[:;] |[:;])", re.I)
 users = {}
 
 class User:
@@ -24,10 +24,12 @@ class User:
 		self.voted_user = None # User
 
 	def vote(self, voted):
+		out = None
 		if self.voted_user is not None:
-			print("WARNING:", self.name, "overwrote previous vote of", self.voted_user.name, "with", voted.name)
+			#print("WARNING:", self.name, "overwrote previous vote of", self.voted_user.name, "with", voted.name)
+			out = self.voted_user
 		self.voted_user = voted
-		return True
+		return out
 
 	def unvote(self, voted):
 		if self.voted_user == voted:
@@ -89,7 +91,7 @@ for i, json_comment in enumerate(json_comments):
 	if not vote_finds or json_comment["from"]["name"] in ignore:
 		continue
 	comment = Comment.from_json(json_comment, i)
-	comments.append(comment)
+	
 
 	tags = {tag["offset"]: get_user(tag["id"], tag["name"]) for tag in comment.message_tags}
 
@@ -111,21 +113,27 @@ for i, json_comment in enumerate(json_comments):
 			print("Message:")
 			print(comment.message)
 			print()
+			comment.vote_details.append(("ignored", (voted,)))
 			continue
 		if vote.group("is_unvote"):
 			r = comment.user.unvote(voted)
 			if r:
 				# print(comment.user, "unvoted for", voted)
-				comment.vote_details.append((voted, True))
+				comment.vote_details.append(("unvote", (voted,)))
 			else:
 				print("UNSUCCESSFUL UNVOTE:", comment.user, "whoopsied", voted, "(they voted for", comment.user.voted_user, "before)")
 				print("Message:")
 				print(comment.message)
 				print()
+				comment.vote_details.append(("no unvote", (voted, comment.user.voted_user))) # didn't unvote, previous
 		else:
-			comment.user.vote(voted)
-			comment.vote_details.append((voted, False))
-			# print(comment.user, "voted for", voted)
+			r = comment.user.vote(voted)
+			comment.vote_details.append(("vote", (voted,)))
+			if r is not None:
+				comment.vote_details.append(("overvote", (voted, r))) # voted, previous
+	
+	if comment.vote_details:
+		comments.append(comment)
 
 env = Environment(loader=FileSystemLoader("templates"), trim_blocks=True, lstrip_blocks=True)
 filtered_users = [user for user in users_values if user.voted_user]

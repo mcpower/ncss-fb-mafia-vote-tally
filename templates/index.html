@@ -1,13 +1,67 @@
 {% macro profile_picture(user) -%}
-    <img src="{{user.picture}}" alt="{{user.name}}" title="{{user.name}}">
+    <a href="https://facebook.com/{{ user.fbid }}"><img src="{{user.picture}}" alt="{{user.name}}" title="{{user.name}}"></a>
+{%- endmacro %}
+{% macro user_link(user) -%}
+    <a href="https://facebook.com/{{ user.fbid }}">{{ user.name }}</a>
 {%- endmacro %}
 <!DOCTYPE html>
 <html>
 	<body>
-		{% for victim, against in tally %}
-		<p>
-			{{ profile_picture(victim) }} was voted against by {% for lyncher in against %}{{ profile_picture(lyncher) }}{% endfor %}
-		</p>
-		{% endfor %}
+		<h1>Votes</h1>
+		<div style="white-space:nowrap;">
+			{% for victim, against in tally %}
+			<p>
+				{{ profile_picture(victim) }} was voted against by {% for lyncher in against %}{{ profile_picture(lyncher) }}{% endfor %} ({{ against|count }})
+			</p>
+			{% endfor %}
+		</div>
+		<h1>Comments</h1>
+		<div>
+			<table>
+				<thead>
+					<tr>
+						<th width="50">User</th>
+						<th width="600">Comment</th>
+						<th width="200">Notes</th>
+						<th width="1"></th>
+					</tr>
+				</thead>
+				<tbody>
+					{% set last_index = -1 %}
+					{% for comment in comments %}
+					{% if comment.index - last_index > 1 %}
+					<tr>
+						<td></td>
+						<td><i>({{ comment.index - last_index - 1 }} comment{% if comment.index - last_index != 2 %}s{% endif %} in-between)</i></td>
+						<td></td>
+						<td></td>
+					</tr>
+					{% endif %}
+					{% set last_index = comment.index %}
+					<tr>
+						<td>{{ profile_picture(comment.user) }}</td>
+						<td><b>{{ user_link(comment.user) }}: </b>{{ comment.message|e|replace("\n", "<br>") }}</td>
+						<td>
+						{% for detail, users in comment.vote_details %}
+							{% if detail == "vote" %}
+							Voted for {{ user_link(users[0]) }}.
+							{% elif detail == "unvote" %}
+							Unvoted {{ user_link(users[0]) }}.
+							{% elif detail == "ignored" %}
+							Tried voting for ignored user {{ user_link(users[0]) }}. (Nothing happened.)
+							{% elif detail == "no unvote" %}
+							Tried unvoting {{ user_link(users[0]) }}, but they voted {{ user_link(users[1]) }} before. (Nothing happened.)
+							{% elif detail == "overvote" %}
+							Voted for {{ user_link(users[0]) }} (overriding their previous vote of {{ user_link(users[1]) }}).
+							{% endif %}
+							<br>
+						{% endfor %}
+						</td>
+						<td><a href="{{ comment.get_fb_url() }}">x</a></td>
+					</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		</div>
 	</body>
 </html>
