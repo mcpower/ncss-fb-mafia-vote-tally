@@ -91,9 +91,6 @@ for i, json_comment in enumerate(json_comments):
 	comment = Comment.from_json(json_comment, i)
 	comments.append(comment)
 
-	# print(comment.user)
-	# print(comment.message)
-
 	tags = {tag["offset"]: get_user(tag["id"], tag["name"]) for tag in comment.message_tags}
 
 	for vote in vote_finds:
@@ -110,19 +107,25 @@ for i, json_comment in enumerate(json_comments):
 				continue
 			voted = possible_voted[0]
 		if voted.name in ignore:
+			print(comment.user, "tried to vote for ignored user", voted)
+			print("Message:")
+			print(comment.message)
+			print()
 			continue
 		if vote.group("is_unvote"):
 			r = comment.user.unvote(voted)
 			if r:
 				# print(comment.user, "unvoted for", voted)
 				comment.vote_details.append((voted, True))
-			# else:
-				# print("UNSUCCESSFUL UNVOTE:", comment.user, "whoopsied", voted)
+			else:
+				print("UNSUCCESSFUL UNVOTE:", comment.user, "whoopsied", voted, "(they voted for", comment.user.voted_user, "before)")
+				print("Message:")
+				print(comment.message)
+				print()
 		else:
 			comment.user.vote(voted)
 			comment.vote_details.append((voted, False))
 			# print(comment.user, "voted for", voted)
-	# print()
 
 env = Environment(loader=FileSystemLoader("templates"), trim_blocks=True, lstrip_blocks=True)
 filtered_users = [user for user in users_values if user.voted_user]
