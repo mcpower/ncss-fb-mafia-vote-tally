@@ -55,4 +55,5 @@ target/
 
 # secret config files
 config.txt
+ignore.txt
 output/

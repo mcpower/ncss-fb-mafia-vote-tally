@@ -6,6 +6,7 @@ from jinja2 import Environment, FileSystemLoader
 
 
 access_token, post_id, group_id, cutoff = [line.strip() for line in open("config.txt").readlines()]
+ignore = {line.strip() for line in open("ignore.txt").readlines()}
 
 COMMENTS_TEMPLATE = "https://graph.facebook.com/v2.2/{post_id}/comments?fields=from,message,message_tags,created_time&limit=300&access_token={access_token}"
 MEMBERS_TEMPLATE = "https://graph.facebook.com/v2.2/{group_id}/members?fields=id,name,picture{{url}}&limit=200&access_token={access_token}"
@@ -85,7 +86,7 @@ class Comment:
 
 for i, json_comment in enumerate(json_comments):
 	vote_finds = list(vote_re.finditer(json_comment["message"]))
-	if not vote_finds:
+	if not vote_finds or json_comment["from"]["name"] in ignore:
 		continue
 	comment = Comment.from_json(json_comment, i)
 	comments.append(comment)
@@ -108,7 +109,8 @@ for i, json_comment in enumerate(json_comments):
 				# print("Found more than one possible user:", ", ".join(str(user) for user in possible_voted))
 				continue
 			voted = possible_voted[0]
-
+		if voted.name in ignore:
+			continue
 		if vote.group("is_unvote"):
 			r = comment.user.unvote(voted)
 			if r:

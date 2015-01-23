@@ -11,3 +11,5 @@ post_id (id of tracked post)
 group_id (id of group)
 cutoff (the voting cutoff, like 2015-01-23T13:00:00+0000)
 ```
+
+and put a list of full names in ignore.txt to ignore (separated by new lines).
