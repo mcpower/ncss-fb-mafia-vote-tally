@@ -3,11 +3,12 @@ from __future__ import print_function
 import requests
 import re
 import json
+import os.path
 from jinja2 import Environment, FileSystemLoader
 
-
-access_token, post_id, group_id, cutoff = [line.strip() for line in open("config.txt").readlines()]
-ignore = {line.strip() for line in open("ignore.txt").readlines()}
+get_path = lambda x: os.path.join(os.path.dirname(__file__), x)
+access_token, post_id, group_id, cutoff = [line.strip() for line in open(get_path("config.txt")).readlines()]
+ignore = {line.strip() for line in open(get_path("ignore.txt")).readlines()}
 
 COMMENTS_TEMPLATE = "https://graph.facebook.com/v2.2/{post_id}/comments?fields=from,message,message_tags,created_time&limit=300&access_token={access_token}"
 MEMBERS_TEMPLATE = "https://graph.facebook.com/v2.2/{group_id}/members?fields=id,name,picture{{url}}&limit=200&access_token={access_token}"
@@ -139,7 +140,7 @@ for i, json_comment in enumerate(json_comments):
 	if comment.vote_details:
 		comments.append(comment)
 
-env = Environment(loader=FileSystemLoader("templates"), trim_blocks=True, lstrip_blocks=True)
+env = Environment(loader=FileSystemLoader(get_path("templates")), trim_blocks=True, lstrip_blocks=True)
 filtered_users = [user for user in users_values if user.voted_user]
 tally = {} # User: [User]
 for user in filtered_users:
@@ -147,4 +148,4 @@ for user in filtered_users:
 		tally[user.voted_user] = []
 	tally[user.voted_user].append(user)
 sorted_tally = sorted(tally.items(), key=lambda x: len(x[1]), reverse=True)
-open("output/index.html", "w").write(env.get_template("index.html").render(comments=comments, users=list(users_values), tally=sorted_tally, overtime=overtime).encode("utf-8"))
+open(get_path("output/index.html"), "w").write(env.get_template("index.html").render(comments=comments, users=list(users_values), tally=sorted_tally, overtime=overtime).encode("utf-8"))
