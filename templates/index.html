@@ -1,11 +1,15 @@
 {% macro profile_picture(user) -%}
-    <a href="https://facebook.com/{{ user.fbid }}"><img src="{{user.picture}}" alt="{{user.name}}" title="{{user.name}}"></a>
+	<a href="https://facebook.com/{{ user.fbid }}"><img src="{{user.picture}}" alt="{{user.name}}" title="{{user.name}}"></a>
 {%- endmacro %}
 {% macro user_link(user) -%}
-    <a href="https://facebook.com/{{ user.fbid }}">{{ user.name }}</a>
+	<a href="https://facebook.com/{{ user.fbid }}">{{ user.name }}</a>
 {%- endmacro %}
 <!DOCTYPE html>
 <html>
+	<head>
+		<title>NCSS FB Mafia Vote Tally</title>
+		<link type="text/css" rel="stylesheet" href="/style/main.css">
+	</head>
 	<body>
 		<h1>Votes</h1>
 		<div style="white-space:nowrap;">
