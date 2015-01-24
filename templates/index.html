@@ -53,7 +53,7 @@
 							{% elif detail == "ignored" %}
 							Tried voting for ignored user {{ user_link(users[0]) }}. (Nothing happened.)
 							{% elif detail == "no unvote" %}
-							Tried unvoting {{ user_link(users[0]) }}, but they voted {{ user_link(users[1]) }} before. (Nothing happened.)
+							Tried unvoting {{ user_link(users[0]) }}, but they voted {{ user_link(users[1]) if users[1] else "for no-one"}} before. (Nothing happened.)
 							{% elif detail == "overvote" %}
 							Voted for {{ user_link(users[0]) }} (overriding their previous vote of {{ user_link(users[1]) }}).
 							{% endif %}
