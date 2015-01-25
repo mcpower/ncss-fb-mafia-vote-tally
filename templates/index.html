@@ -47,7 +47,7 @@
 					{% set last_index = comment.index %}
 					<tr>
 						<td>{{ profile_picture(comment.user) }}</td>
-						<td><b>{{ user_link(comment.user) }}: </b>{{ comment.message|e|replace("\n", "<br>") }}</td>
+						<td><b>{{ user_link(comment.user) }}</b><br>{{ comment.message|e|replace("\n", "<br>") }}</td>
 						<td>
 						{% for detail, users in comment.vote_details %}
 							{% if detail == "vote" %}
