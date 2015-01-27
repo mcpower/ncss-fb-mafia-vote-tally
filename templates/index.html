@@ -19,6 +19,9 @@
 			</p>
 			{% endfor %}
 		</div>
+		<div>
+			Players who haven't voted: {% for no_voter in no_voters %}{{ profile_picture(no_voter) }}{% endfor %}
+		</div>
 		{% if overtime %}
 		<div>Time's up! The time cutoff has been reached.</div>
 		{% endif %}
