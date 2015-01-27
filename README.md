@@ -20,4 +20,9 @@ group_id (id of group)
 cutoff (the voting cutoff, like 2015-01-23T13:00:00+0000)
 ```
 
-and put a list of full names in ignore.txt to ignore (separated by new lines).
+and put a list of full names in players.txt to blacklist/whitelist. (separated by new lines). Make sure you start the file with either "BLACKLIST" or "WHITELIST" For example:
+
+```
+BLACKLIST
+Mark Zuckerberg
+```

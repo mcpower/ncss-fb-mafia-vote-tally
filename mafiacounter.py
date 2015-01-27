@@ -8,7 +8,16 @@ from jinja2 import Environment, FileSystemLoader
 
 get_path = lambda x: os.path.join(os.path.dirname(__file__), x)
 access_token, post_id, group_id, cutoff = [line.strip() for line in open(get_path("config.txt")).readlines()]
-ignore = {line.strip() for line in open(get_path("ignore.txt")).readlines()}
+player_file = [line.strip() for line in open(get_path("players.txt")).readlines()]
+if player_file[0] == "WHITELIST":
+	is_whitelist = True
+	players = {player for player in player_file[1:] if not player.startswith("#")}
+elif player_file[0] == "BLACKLIST":
+	is_whitelist = False
+	players = {player for player in player_file[1:] if not player.startswith("#")}
+else:
+	is_whitelist = False
+	whitelist = set()
 
 COMMENTS_TEMPLATE = "https://graph.facebook.com/v2.2/{post_id}/comments?fields=from,message,message_tags,created_time&limit=300&access_token={access_token}"
 MEMBERS_TEMPLATE = "https://graph.facebook.com/v2.2/{group_id}/members?fields=id,name,picture{{url}}&limit=200&access_token={access_token}"
@@ -91,7 +100,11 @@ class Comment:
 overtime = False
 for i, json_comment in enumerate(json_comments):
 	vote_finds = list(vote_re.finditer(json_comment["message"]))
-	if not vote_finds or json_comment["from"]["name"] in ignore:
+	if not vote_finds:
+		continue
+	if not is_whitelist and json_comment["from"]["name"] in players:
+		continue
+	if is_whitelist and json_comment["from"]["name"] not in players:
 		continue
 	comment = Comment.from_json(json_comment, i)
 	if comment.time >= cutoff:
@@ -113,7 +126,7 @@ for i, json_comment in enumerate(json_comments):
 				# print("Found more than one possible user:", ", ".join(str(user) for user in possible_voted))
 				continue
 			voted = possible_voted[0]
-		if voted.name in ignore:
+		if (is_whitelist and voted.name not in players) or (not is_whitelist and voted.name in players):
 			print(comment.user, "tried to vote for ignored user", voted)
 			print("Message:")
 			print(comment.message)
