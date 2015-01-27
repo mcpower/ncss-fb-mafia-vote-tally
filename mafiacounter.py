@@ -146,9 +146,10 @@ for i, json_comment in enumerate(json_comments):
 				comment.vote_details.append(("no unvote", (voted, comment.user.voted_user))) # didn't unvote, previous
 		else:
 			r = comment.user.vote(voted)
-			comment.vote_details.append(("vote", (voted,)))
 			if r is not None:
 				comment.vote_details.append(("overvote", (voted, r))) # voted, previous
+			else:
+				comment.vote_details.append(("vote", (voted,)))
 	
 	if comment.vote_details:
 		comments.append(comment)
