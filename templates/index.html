@@ -18,12 +18,22 @@
 				{{ profile_picture(victim) }} was voted by {% for lyncher in against %}{{ profile_picture(lyncher) }}{% endfor %} ({{ against|count }})
 			</p>
 			{% endfor %}
+			<p>
+				Players who haven't voted: {% for no_voter in no_voters %}{{ profile_picture(no_voter) }}{% endfor %}
+			</p>
 		</div>
-		<div>
-			Players who haven't voted: {% for no_voter in no_voters %}{{ profile_picture(no_voter) }}{% endfor %}
-		</div>
+		<details>
+			<summary>Plain text summary</summary>
+			<div>VOTE TALLY:</div>
+			{% for victim, against in tally %}
+			<div>
+				{{ user_link(victim) }}: {{ against|count }} ({% for lyncher in against %}{{ user_link(lyncher) }}{% if not loop.last %}, {% endif %}{% endfor %})
+			</div>
+			{% endfor %}
+			<div>Didn't vote: {{ no_voters|count }} ({% for no_voter in no_voters %}{{ user_link(no_voter) }}{% if not loop.last %}, {% endif %}{% endfor %})
+		</details>
 		{% if overtime %}
-		<div>Time's up! The time cutoff has been reached.</div>
+		<p>Time's up! The time cutoff has been reached.</p>
 		{% endif %}
 		<h1>Comments</h1>
 		<div>
