@@ -62,8 +62,7 @@ def get_user(fbid, name=None):
 
 members_request = requests.get(members_url)
 json_members = members_request.json()["data"]
-for json_member in json_members:
-	users[json_member["id"]] = User(json_member["id"], json_member["name"], json_member["picture"]["data"]["url"])
+users = {json_member["id"]: User(json_member["id"], json_member["name"], json_member["picture"]["data"]["url"]) for json_member in json_members}
 
 comments_request = requests.get(comments_url)
 json_comments = comments_request.json()["data"]
