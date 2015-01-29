@@ -68,6 +68,12 @@ comments_request = requests.get(comments_url)
 json_comments = comments_request.json()["data"]
 
 users_values = users.viewvalues()
+check_players = set(players) # a copy
+for user in users_values:
+	if user.name in check_players:
+		check_players.remove(user.name)
+for unfound_player in check_players:
+	print("UNFOUND PLAYER:", unfound_player)
 
 comments = []
 # yes, I know classes are overkill for this, but dicts aren't that great for objects
