@@ -4,6 +4,7 @@ import requests
 import re
 import json
 import os.path
+import time
 from jinja2 import Environment, FileSystemLoader
 
 get_path = lambda x: os.path.join(os.path.dirname(__file__), x)
@@ -102,7 +103,7 @@ class Comment:
 			index
 		)
 
-overtime = False
+overtime = time.strftime("%Y-%m-%dT%H:%M:%S+0000",time.gmtime()) >= cutoff
 for i, json_comment in enumerate(json_comments):
 	vote_finds = list(vote_re.finditer(json_comment["message"]))
 	if not vote_finds:
@@ -113,7 +114,6 @@ for i, json_comment in enumerate(json_comments):
 		continue
 	comment = Comment.from_json(json_comment, i)
 	if comment.time >= cutoff:
-		overtime = True
 		break
 
 	tags = {tag["offset"]: get_user(tag["id"], tag["name"]) for tag in comment.message_tags}
