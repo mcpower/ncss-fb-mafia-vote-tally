@@ -5,7 +5,7 @@ Warning: extremely hacky and bad code.
 
 # Prerequisites
 You need a few things:
-* Python 2
+* Python 3
 * Requests
 * Jinja2
 

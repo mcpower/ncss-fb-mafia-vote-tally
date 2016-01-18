@@ -68,7 +68,7 @@ users = {json_member["id"]: User(json_member["id"], json_member["name"], json_me
 comments_request = requests.get(comments_url)
 json_comments = comments_request.json()["data"]
 
-users_values = users.viewvalues()
+users_values = users.values()
 check_players = set(players) # a copy
 for user in users_values:
 	if user.name in check_players:
@@ -168,4 +168,4 @@ for user in filtered_users:
 	tally[user.voted_user].append(user)
 no_voters = [user for user in users_values if user.voted_user is None and ((is_whitelist and user.name in players) or (not is_whitelist and user.name not in players))]
 sorted_tally = sorted(tally.items(), key=lambda x: len(x[1]), reverse=True)
-open(get_path("output/index.html"), "w").write(env.get_template("index.html").render(comments=comments, users=list(users_values), tally=sorted_tally, no_voters=no_voters, overtime=overtime).encode("utf-8"))
+open(get_path("output/index.html"), "w").write(env.get_template("index.html").render(comments=comments, users=list(users_values), tally=sorted_tally, no_voters=no_voters, overtime=overtime))
