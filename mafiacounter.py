@@ -8,7 +8,12 @@ import time
 from jinja2 import Environment, FileSystemLoader
 
 get_path = lambda x: os.path.join(os.path.dirname(__file__), x)
-access_token, post_id, group_id, cutoff = [line.strip() for line in open(get_path("config.txt")).readlines()]
+conf = open(get_path("config.txt")).readlines()
+access_token, post_id, group_id, cutoff = [line.strip() for line in conf[:4]]
+if len(conf) > 4:
+	double_user = conf[4].strip()
+else:
+	double_user = None
 player_file = [line.strip() for line in open(get_path("players.txt")).readlines()]
 if player_file[0] == "WHITELIST":
 	is_whitelist = True
@@ -166,6 +171,8 @@ for user in filtered_users:
 	if user.voted_user not in tally:
 		tally[user.voted_user] = []
 	tally[user.voted_user].append(user)
+	if user.name == double_user:
+		tally[user.voted_user].append(user)
 no_voters = [user for user in users_values if user.voted_user is None and ((is_whitelist and user.name in players) or (not is_whitelist and user.name not in players))]
 sorted_tally = sorted(tally.items(), key=lambda x: len(x[1]), reverse=True)
 open(get_path("output/index.html"), "w").write(env.get_template("index.html").render(comments=comments, users=list(users_values), tally=sorted_tally, no_voters=no_voters, overtime=overtime))
