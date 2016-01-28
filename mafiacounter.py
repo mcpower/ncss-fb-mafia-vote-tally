@@ -33,6 +33,8 @@ members_url = MEMBERS_TEMPLATE.format(group_id=group_id, access_token=access_tok
 vote_re = re.compile(r"\b(?P<is_unvote>UN)?VOTE( |[:;] |[:;])", re.I)
 users = {}
 
+ABSTAIN = object()
+
 class User:
 	def __init__(self, fbid, name, picture=None):
 		self.fbid = fbid # str
@@ -127,6 +129,20 @@ for i, json_comment in enumerate(json_comments):
 		end = vote.end()
 		if end in tags:
 			voted = tags[end]
+		elif comment.message.lower().startswith("abstain", end):
+			if vote.group("is_unvote"):
+				r = comment.user.unvote(ABSTAIN)
+				if r:
+					comment.vote_details.append(("unabstain", tuple()))
+				else:
+					comment.vote_details.append(("no unabstain", (comment.user.voted_user,))) # previous
+			else:
+				r = comment.user.vote(ABSTAIN)
+				if r is not None:
+					comment.vote_details.append(("overabstain", (r,))) # previous
+				else:
+					comment.vote_details.append(("abstain", tuple())) 
+			continue
 		else:
 			possible_voted = [user for user in users_values if comment.message.lower().startswith(user.name.lower(), end)]
 			if len(possible_voted) == 0:
@@ -166,8 +182,12 @@ for i, json_comment in enumerate(json_comments):
 
 env = Environment(loader=FileSystemLoader(get_path("templates")), trim_blocks=True, lstrip_blocks=True)
 filtered_users = [user for user in users_values if user.voted_user]
+abstainers = []
 tally = {} # User: [User]
 for user in filtered_users:
+	if user.voted_user is ABSTAIN:
+		abstainers.append(user)
+		continue
 	if user.voted_user not in tally:
 		tally[user.voted_user] = []
 	tally[user.voted_user].append(user)
@@ -175,4 +195,4 @@ for user in filtered_users:
 		tally[user.voted_user].append(user)
 no_voters = [user for user in users_values if user.voted_user is None and ((is_whitelist and user.name in players) or (not is_whitelist and user.name not in players))]
 sorted_tally = sorted(tally.items(), key=lambda x: len(x[1]), reverse=True)
-open(get_path("output/index.html"), "w").write(env.get_template("index.html").render(comments=comments, users=list(users_values), tally=sorted_tally, no_voters=no_voters, overtime=overtime))
+open(get_path("output/index.html"), "w").write(env.get_template("index.html").render(comments=comments, users=list(users_values), tally=sorted_tally, no_voters=no_voters, overtime=overtime, abstainers=abstainers))

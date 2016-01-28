@@ -1,5 +1,5 @@
 {% macro profile_picture(user) -%}
-	<a href="https://facebook.com/{{ user.fbid }}"><img src="{{user.picture}}" alt="{{user.name}}" title="{{user.name}}"></a>
+	<a href="https://facebook.com/{{ user.fbid }}"><img src="{{user.picture}}" alt="{{user.name}}" title="{{user.name}}" width="50" height="50"></a>
 {%- endmacro %}
 {% macro user_link(user) -%}
 	<a href="https://facebook.com/{{ user.fbid }}">{{ user.name }}</a>
@@ -19,6 +19,9 @@
 			</p>
 			{% endfor %}
 			<p>
+				Abstaining: {% for abstainer in abstainers %}{{ profile_picture(abstainer) }}{% endfor %}
+			</p>
+			<p>
 				Players who haven't voted: {% for no_voter in no_voters %}{{ profile_picture(no_voter) }}{% endfor %}
 			</p>
 		</div>
@@ -30,7 +33,12 @@
 				{{ user_link(victim) }}: {{ against|count }} ({% for lyncher in against %}{{ user_link(lyncher) }}{% if not loop.last %}, {% endif %}{% endfor %})
 			</div>
 			{% endfor %}
-			<div>Didn't vote: {{ no_voters|count }} ({% for no_voter in no_voters %}{{ user_link(no_voter) }}{% if not loop.last %}, {% endif %}{% endfor %})
+			<div>
+				Abstaining: {{ abstainers|count }} ({% for abstainer in abstainers %}{{ user_link(abstainer) }}{% if not loop.last %}, {% endif %}{% endfor %})
+			</div>
+			<div>
+				Didn't vote: {{ no_voters|count }} ({% for no_voter in no_voters %}{{ user_link(no_voter) }}{% if not loop.last %}, {% endif %}{% endfor %})
+			</div>
 		</details>
 		{% if overtime %}
 		<p>Time's up! The time cutoff has been reached.</p>
@@ -73,6 +81,14 @@
 							Tried unvoting {{ user_link(users[0]) }}, but they voted {{ user_link(users[1]) if users[1] else "for no-one"}} before. (Nothing happened.)
 							{% elif detail == "overvote" %}
 							Voted for {{ user_link(users[0]) }} (overriding their previous vote of {{ user_link(users[1]) }}).
+							{% elif detail == "abstain" %}
+							User abstained.
+							{% elif detail == "unabstain" %}
+							User unabstained.
+							{% elif detail == "no unabstain" %}
+							Tried unabstaining, but they voted for {{ user_link(users[0]) if users[0] else "for no-one"}} before. (Nothing happened.)
+							{% elif detail == "overabstain" %}
+							User abstained, overriding their previous vote of {{ user_link(users[0]) }}.
 							{% endif %}
 							<br>
 						{% endfor %}
