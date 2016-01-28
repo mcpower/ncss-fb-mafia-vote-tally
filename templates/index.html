@@ -2,13 +2,7 @@
 	<a href="https://facebook.com/{{ user.fbid }}"><img src="{{user.picture}}" alt="{{user.name}}" title="{{user.name}}" width="50" height="50"></a>
 {%- endmacro %}
 {% macro user_link(user) -%}
-	{% if user is ABSTAIN %}
-	abstaining
-	{% elif user %}
-	no-one
-	{% else %}
-	<a href="https://facebook.com/{{ user.fbid }}">{{ user.name }}</a>
-	{% endif %}
+	{% if user == ABSTAIN %}abstaining{% elif not user %}no-one{% else %}<a href="https://facebook.com/{{ user.fbid }}">{{ user.name }}</a>{% endif %}
 {%- endmacro %}
 <!DOCTYPE html>
 <html>
