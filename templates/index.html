@@ -2,7 +2,13 @@
 	<a href="https://facebook.com/{{ user.fbid }}"><img src="{{user.picture}}" alt="{{user.name}}" title="{{user.name}}" width="50" height="50"></a>
 {%- endmacro %}
 {% macro user_link(user) -%}
+	{% if user is ABSTAIN %}
+	abstaining
+	{% elif user %}
+	no-one
+	{% else %}
 	<a href="https://facebook.com/{{ user.fbid }}">{{ user.name }}</a>
+	{% endif %}
 {%- endmacro %}
 <!DOCTYPE html>
 <html>
@@ -78,7 +84,7 @@
 							{% elif detail == "ignored" %}
 							Tried voting for ignored user {{ user_link(users[0]) }}. (Nothing happened.)
 							{% elif detail == "no unvote" %}
-							Tried unvoting {{ user_link(users[0]) }}, but they voted {{ user_link(users[1]) if users[1] else "for no-one"}} before. (Nothing happened.)
+							Tried unvoting {{ user_link(users[0]) }}, but they voted {{ user_link(users[1]) }} before. (Nothing happened.)
 							{% elif detail == "overvote" %}
 							Voted for {{ user_link(users[0]) }} (overriding their previous vote of {{ user_link(users[1]) }}).
 							{% elif detail == "abstain" %}
@@ -86,7 +92,7 @@
 							{% elif detail == "unabstain" %}
 							User unabstained.
 							{% elif detail == "no unabstain" %}
-							Tried unabstaining, but they voted for {{ user_link(users[0]) if users[0] else "for no-one"}} before. (Nothing happened.)
+							Tried unabstaining, but they voted for {{ user_link(users[0]) }} before. (Nothing happened.)
 							{% elif detail == "overabstain" %}
 							User abstained, overriding their previous vote of {{ user_link(users[0]) }}.
 							{% endif %}
