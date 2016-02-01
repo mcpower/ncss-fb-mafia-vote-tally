@@ -11,7 +11,12 @@ You need a few things:
 
 `pip` is your friend when installing the latter two.
 
-Put this in config.txt:
+You need to create these files:
+* `config.txt`
+* `players.txt`
+* `voteweights.txt`
+
+In `config.txt`:
 
 ```
 access_token (FB access token)
@@ -20,9 +25,16 @@ group_id (id of group)
 cutoff (the voting cutoff, like 2015-01-23T13:00:00+0000)
 ```
 
-and put a list of full names in players.txt to blacklist/whitelist. (separated by new lines). Make sure you start the file with either "BLACKLIST" or "WHITELIST" For example:
+In `players.txt`, a list of full names in players.txt to blacklist/whitelist (separated by new lines). Start the file with either "BLACKLIST" or "WHITELIST".:
 
 ```
-BLACKLIST
+WHITELIST
 Mark Zuckerberg
+John Smith
+```
+
+In `voteweights.txt`, custom vote weights for each person (can be empty):
+
+```
+Mark Zuckerberg|3
 ```
