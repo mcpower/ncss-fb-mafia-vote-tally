@@ -56,4 +56,5 @@ target/
 # secret config files
 config.txt
 players.txt
+voteweights.txt
 output/

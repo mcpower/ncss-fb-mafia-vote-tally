@@ -9,12 +9,10 @@ from jinja2 import Environment, FileSystemLoader
 
 get_path = lambda x: os.path.join(os.path.dirname(__file__), x)
 conf = open(get_path("config.txt")).readlines()
-access_token, post_id, group_id, cutoff = [line.strip() for line in conf[:4]]
-if len(conf) > 4:
-	double_user = conf[4].strip()
-else:
-	double_user = None
+access_token, post_id, group_id, cutoff = [line.strip() for line in conf]
 player_file = [line.strip() for line in open(get_path("players.txt")).readlines()]
+vote_weights = [line.strip().split("|") for line in open(get_path("voteweights.txt")).readlines()]
+vote_weights = {name: int(weight) for name, weight in vote_weights}
 if player_file[0] == "WHITELIST":
 	is_whitelist = True
 	players = {player for player in player_file[1:] if not player.startswith("#")}
@@ -190,8 +188,10 @@ for user in filtered_users:
 		continue
 	if user.voted_user not in tally:
 		tally[user.voted_user] = []
-	tally[user.voted_user].append(user)
-	if user.name == double_user:
+	if user.name in vote_weights:
+		for i in range(vote_weights[user.name]):
+			tally[user.voted_user].append(user)
+	else:
 		tally[user.voted_user].append(user)
 no_voters = [user for user in users_values if user.voted_user is None and ((is_whitelist and user.name in players) or (not is_whitelist and user.name not in players))]
 sorted_tally = sorted(tally.items(), key=lambda x: len(x[1]), reverse=True)
