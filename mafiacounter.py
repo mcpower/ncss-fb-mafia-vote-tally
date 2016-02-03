@@ -50,7 +50,7 @@ class User:
 
 	def unvote(self, voted):
 		if self.voted_user == voted:
-			self.voted_user = None
+			self.voted_user = ABSTAIN
 			return True
 		else:
 			return False
