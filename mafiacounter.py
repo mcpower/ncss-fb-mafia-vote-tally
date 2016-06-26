@@ -28,7 +28,7 @@ MEMBERS_TEMPLATE = "https://graph.facebook.com/v2.2/{group_id}/members?fields=id
 comments_url = COMMENTS_TEMPLATE.format(post_id=post_id, access_token=access_token, group_id=group_id)
 members_url = MEMBERS_TEMPLATE.format(group_id=group_id, access_token=access_token)
 
-vote_re = re.compile(r"\b(?P<is_unvote>UN)?VOTE( |[:;] |[:;])", re.I)
+vote_re = re.compile(r"\b(?P<is_unvote>UN)?VOTE\s*[:;]?\s*", re.I)
 users = {}
 
 ABSTAIN = object()
